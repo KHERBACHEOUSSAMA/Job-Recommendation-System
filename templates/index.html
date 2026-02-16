@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Search</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Imperial+Script&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer"
+    />
+
+    <style>
+        .search,.country{
+            width: 600px;
+        }
+        h2,h3,h4,h5,h6,p {
+                font-family: "Montserrat", sans-serif;
+            }
+        h1 {
+                font-family: "Imperial Script", sans-serif;
+            }
+        body {
+            
+            margin: 20px;
+            background-color:rgba(187, 202, 203, 0.28);
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .card {
+            margin-top: 20px;
+        }
+        .form-control, .btn {
+            border-radius: 10px;
+        }
+        .btn-primary {
+            margin-left: 50px;
+            border-radius: 10px;
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Job Search Portal</h1>
+        <p class="text-center text-muted">Search for jobs based on your criteria.</p>
+
+        <form method="POST" class="mt-4">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" name="query" class="form-control" placeholder="Job title or skills" required>
+                </div>
+            </br>
+                <div class="country">
+                    <select name="country" class="form-control">
+                        <option value="">Choose a country</option>
+                        {% for country in countries %}
+                            <option value="{{ country }}">{{ country }}</option>
+                        {% endfor %}
+                    </select>
+
+                    
+                </div>
+
+                <div class="search" >
+                    <input type="radio" name="search" value="Inv-ID" checked> Inverted Index
+                </br>
+                    <input type="radio" name="search" value="TF-IDF"> TF-IDF
+                </div>
+
+                </div>
+            </div>
+            <div class="text-start mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">Search</button>
+            </div>
+        </form>
+
+        {% if error %}
+            <div class="alert alert-danger mt-4 text-center">{{ error }}</div>
+        {% endif %}
+
+        {% if recommendations %}
+            <h2 class="mt-5">Search Results</h2>
+            <div class="row">
+                {% for job in recommendations %}
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ job.JobTitle }}</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">{{ job.Company }} - {{ job.Location }}</h6>
+                                <p class="card-text"><strong>Salary:</strong> {{ job.SalaryRange }}</p>
+                                <p class="card-text"><strong>Skills:</strong> {{ job.skills }}</p>
+                                <p class="card-text"><strong>Qualifications:</strong> {{ job.Qualifications }}</p>
+                                <p class="card-text"><strong>Experience:</strong> {{ job.Experience }}</p>
+                                <p class="card-text"><strong>Responsibilities:</strong> {{ job.Responsibilities }}</p>
+                                <p class="card-text"><strong>Benefits:</strong> {{ job.Benefits }}</p>
+                                <p class="card-text"><strong>Job Posting Date:</strong> {{ job.Date }}</p>
+                                <p class="card-text"><strong>Contact:</strong> {{ job.Contact }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination Controls -->
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page > 1 %}
+                        <li class="page-item">
+                            <form method="POST" class="d-inline">
+                                <input type="hidden" name="query" value="{{ query }}">
+                                <input type="hidden" name="country" value="{{ country }}">
+                                <input type="hidden" name="page" value="{{ page - 1 }}">
+                                <input type="hidden" name="search" value="{{ search }}">
+                                <button type="submit" class="page-link">Previous</button>
+                            </form>
+                        </li>
+                    {% endif %}
+
+                    {% if page * results_per_page < total_results %}
+                        <li class="page-item">
+                            <form method="POST" class="d-inline">
+                                <input type="hidden" name="query" value="{{ query }}">
+                                <input type="hidden" name="country" value="{{ country }}">
+                                <input type="hidden" name="page" value="{{ page + 1 }}">
+                                <input type="hidden" name="search" value="{{ search }}">
+                                <button type="submit" class="page-link">Next</button>
+                            </form>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% elif query %}
+            <div class="alert alert-warning mt-4 text-center">No jobs found for "{{ query }}".</div>
+        {% endif %}
+
+        <!-- Saved Searches -->
+        {% if session['saved_searches'] %}
+            <h3 class="mt-5">Saved Searches</h3>
+            <ul class="list-group">
+                {% for search in session['saved_searches'] %}
+                  <li class="list-group-item">
+                       <strong>Query:</strong> {{ search['query'] }} |
+                       <strong>Country:</strong> {{ search['country'] }} |
+                       <strong>Search:</strong> {{ search['search'] }} |
+                    </li>
+                {% endfor %}
+             </ul>
+        {% else %}
+            <p class="mt-5 text-muted">No saved searches yet.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
