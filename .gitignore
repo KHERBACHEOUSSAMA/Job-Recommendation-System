@@ -1,6 +1,5 @@
 job_descriptions.csv
+inverted_index.txt
 __pycache__/
 *.pyc
-venv/
 .env
-.DS_Store
