@@ -2,61 +2,69 @@
 
 ![Logo](logo-01.png)
 
-A job search portal developed with **Flask**, using **TF-IDF** and an **Inverted Index** to recommend jobs.
+A job search portal built with **Flask** that recommends jobs using **TF-IDF** ranking and an **inverted index**, with fuzzy keyword matching and country filters.
 
 ## Features
 
-- Keyword search with **fuzzy matching**.
-- Search using **TF-IDF** or **Inverted Index**.
-- Filter by **country**.
-- Pagination of results.
-- Saves search history in the user session.
+- Keyword search with fuzzy matching (typos and near-matches still find results)
+- Two search modes: **TF-IDF** (cosine similarity ranking) or **inverted index** (fast term lookup)
+- Text preprocessing with NLTK stop-word removal and Porter stemming
+- Filter results by country
+- Paginated results
+- Search history saved in the user session
 
-## Project Structure
+## Tech stack
 
-recomendedsystem
-├─ app.py
-├─ inverted_index.txt
-├─ job_descriptions.csv
-├─ job_recommendation_system_report.pdf
-├─ logo.png
-├─ project.py
-├─ templates/
-│ └─ index.html
-└─ z.py
+Python 3 · Flask · pandas · scikit-learn (TF-IDF, cosine similarity) · spaCy · NLTK · fuzzywuzzy · pycountry · HTML/CSS templates
 
-## Installation
+## How it works
 
-1. Clone the repository:
+1. The job dataset is loaded with pandas and cleaned (irrelevant columns dropped, incomplete rows removed).
+2. An **inverted index** is built from stemmed job-title terms (stop words removed) and saved to `inverted_index.txt`.
+3. A **TF-IDF matrix** is built from each job's title, skills, qualifications and responsibilities.
+4. A user query is tokenized and stemmed, then matched either through the inverted index or by TF-IDF cosine similarity, with optional country filtering.
+
+## Getting started
 
 ```bash
-git clone https://github.com/KHERBACHEOUSSAMA/recomendedsystem.git
-cd recomendedsystem
-Install dependencies:
+git clone https://github.com/KHERBACHEOUSSAMA/Job-Recommendation-System.git
+cd Job-Recommendation-System
+
+python -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
 
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
 ```
 
-Run the application:
+### Dataset
+
+The app expects a file named `job_descriptions.csv` in the project root (it is not included in the repository because of its size). It must contain at least these columns:
+`Job Title`, `Company`, `Country`, `Salary Range`, `skills`, `Qualifications`, `Responsibilities`.
+
+### Run
 
 ```bash
 python app.py
 ```
 
-Open in your browser: http://127.0.0.1:5000/
-Technologies Used
+Then open http://127.0.0.1:5000/
 
-Python 3
+## Project structure
 
-Flask
+```
+Job-Recommendation-System/
+├─ app.py                               # Flask app: data loading, indexing, search, routes
+├─ project.py
+├─ templates/
+│  └─ index.html                        # Search UI
+├─ inverted_index.txt                   # Generated inverted index
+├─ job_recommendation_system_report.pdf # Project report
+├─ requirements.txt
+└─ Procfile                             # Deployment entry point
+```
 
-Spacy
+## Author
 
-TF-IDF & Inverted Index
-
-HTML / CSS (templates)
-
-Author
-
-Oussama Kherbache – Lead Developer
+**Oussama Kherbache**, backend developer
+[GitHub](https://github.com/KHERBACHEOUSSAMA) · [LinkedIn](https://www.linkedin.com/in/oussama-kherbache)
