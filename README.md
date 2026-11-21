@@ -30,7 +30,7 @@ recomendedsystem
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/recomendedsystem.git
+git clone https://github.com/KHERBACHEOUSSAMA/recomendedsystem.git
 cd recomendedsystem
 Install dependencies:
 
